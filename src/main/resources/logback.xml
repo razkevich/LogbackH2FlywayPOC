@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <insertFromJNDI env-entry-name="AppName" as="appName"/>
+    <contextName>${appName}</contextName>
+
+    <jmxConfigurator/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>sfasdfasdf%date{ISO8601} |-%-5level %class{1}:%line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="DB" class="org.razkevich.logging.LoggingDBAppender">
+        <dbNameResolver class="org.razkevich.logging.CustomNameResolver"/>
+        <connectionSource class="ch.qos.logback.core.db.JNDIConnectionSource">
+            <jndiLocation>java:comp/env/jdbc/ds</jndiLocation>
+        </connectionSource>
+    </appender>
+
+    <logger name="org.springframework" level="info"/>
+    <!--<logger name="org.razkevich" level="info"/>-->
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="DB"/>
+    </root>
+
+</configuration>

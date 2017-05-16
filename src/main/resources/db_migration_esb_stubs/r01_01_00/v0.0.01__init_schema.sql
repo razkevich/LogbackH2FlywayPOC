@@ -1,0 +1,64 @@
+﻿CREATE TABLE ST_AUDIT_LOG
+(
+    ID DECIMAL(10) PRIMARY KEY NOT NULL,
+    TIME TIMESTAMP NOT NULL,
+    event DECIMAL(10),
+    stub_Id DECIMAL(10),
+    DESCRIPTION VARCHAR(255)
+);
+CREATE TABLE ST_EVENT_TYPE
+(
+    EVENT_STATUS VARCHAR(20) NOT NULL,
+    EVENT_NAME VARCHAR(100) NOT NULL,
+    ID DECIMAL(10) PRIMARY KEY NOT NULL
+);
+CREATE TABLE ST_STUB
+(
+    ID DECIMAL(10) PRIMARY KEY NOT NULL,
+    REQUEST CLOB NOT NULL,
+    RESPONSE CLOB NOT NULL
+);
+CREATE TABLE ST_STATUS
+(
+    ID DECIMAL(10),
+    stub_Id DECIMAL(10),
+    STATUS VARCHAR(20)
+);
+CREATE TABLE ST_logging_event
+  (
+    timestmp         BIGINT NOT NULL,
+    formatted_message  TEXT NOT NULL,
+    logger_name       VARCHAR(254) NOT NULL,
+    level_string      VARCHAR(254) NOT NULL,
+    reference_flag    SMALLINT,
+    caller_filename   VARCHAR(254) NOT NULL,
+    caller_class      VARCHAR(254) NOT NULL,
+    caller_method     VARCHAR(254) NOT NULL,
+    caller_line       CHAR(4) NOT NULL,
+    event_id          BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY
+  );
+CREATE TABLE ST_logging_event_property
+  (
+    event_id          BIGINT NOT NULL,
+    mapped_key        VARCHAR(254) NOT NULL,
+    mapped_value      TEXT,
+    PRIMARY KEY(event_id, mapped_key),
+    FOREIGN KEY (event_id) REFERENCES ST_logging_event(event_id)
+  );
+CREATE TABLE ST_logging_event_exception
+  (
+    event_id         BIGINT NOT NULL,
+    i                SMALLINT NOT NULL,
+    trace_line       VARCHAR(254) NOT NULL,
+    PRIMARY KEY(event_id, i),
+    FOREIGN KEY (event_id) REFERENCES ST_logging_event(event_id)
+  );
+
+ALTER TABLE ST_AUDIT_LOG ADD FOREIGN KEY (event) REFERENCES ST_EVENT_TYPE (ID);
+ALTER TABLE ST_AUDIT_LOG ADD FOREIGN KEY (stub_Id) REFERENCES ST_STUB (ID);
+CREATE INDEX AUDIT_LOG_EVENT_TYPE_ID_FK_INDEX_E ON ST_AUDIT_LOG (event);
+CREATE INDEX AUDIT_LOG_STUBS_ID_FK_INDEX_E ON ST_AUDIT_LOG (stub_Id);
+CREATE UNIQUE INDEX "EVENT_TYPE_EVENT_NAME_uindex" ON ST_EVENT_TYPE (EVENT_NAME);
+ALTER TABLE ST_STATUS ADD FOREIGN KEY (stub_Id) REFERENCES ST_STUB (ID);
+CREATE INDEX ST_STATUS_ST_STUB_ID_FK_INDEX_2 ON ST_STATUS (stub_Id);
+CREATE SEQUENCE ST_LOGGING_EVENT_SEQ;
